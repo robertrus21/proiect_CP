@@ -4,6 +4,13 @@ import pages.GamesPage;
 import pages.HomePage;
 import share.SharedData;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static helperMethods.MenuHome.*;
@@ -17,9 +24,8 @@ public class Menu {
     SharedData sharedData = new SharedData();
     int input;
     String gameGroup;
-
     int money;
-
+    List <String> finalGamesList = new ArrayList<>();
 
     public void menuSub1Cases() throws InterruptedException {
 
@@ -212,19 +218,13 @@ public class Menu {
             menuHome.menuSub5();
             try {
                 input = sc.nextInt();
-                if (input >= 1 && input <= 4) {
+                if (input >= 1 && input <= 3) {
                     switch (input) {
                         case 1:
-                            System.out.println("1. Previzualizare bilet.");
-                            //catre functie
                             menuSub6Cases(riskValue, amount);
                         case 2:
-                            System.out.println("3. Verifica cotele.");
-                            //catre functie
-                            menuSub8Cases(riskValue);
-                        case 3:
                             menuSub1Cases();
-                        case 4:
+                        case 3:
                             sc.close();
                             sharedData.afterDriver();
                             break;
@@ -241,11 +241,13 @@ public class Menu {
                 System.out.println("|--------------------------------------------------------------------------|");
                 System.out.println("Te rog sa alegi o optiune: ");
                 sc.nextLine();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
     }
 
-    public void menuSub6Cases(int riskValue, int amount) throws InterruptedException {
+    public void menuSub6Cases(int riskValue, int amount) throws InterruptedException, IOException {
 
         while (true) {
             System.out.println();
@@ -264,119 +266,306 @@ public class Menu {
                 for (String number : allNumbers) {
                     Double numberDouble = Double.parseDouble(number);
                     if (numberDouble.equals(validNumber)) {
-                        allNumbersFormatted.add(ANSI_GREEN_BACKGROUND + number + ANSI_RESET);
+                        allNumbersFormatted.add("( " + number + " )");
                     } else {
                         allNumbersFormatted.add(number);
                     }
                 }
                 System.out.println(gameName + " || " + String.join(" - ", allNumbersFormatted));
-            }
-
-            if (allValidNumbers.equals(0)){
-                System.out.println("mata");
+                finalGamesList.add(gameName + " || " + String.join(" - ", allNumbersFormatted));
             }
 
             double possibleWin = calculationMethods.riskStage(allValidNumbers, amount);
             System.out.println();
-            System.out.println(ANSI_GREEN_BACKGROUND + "Posibil castig - calcul standard: " + possibleWin + " RON" + ANSI_RESET);
-            System.out.println();
-
-            menuHome.menuSub6();
-            try {
-                input = sc.nextInt();
-                if (input >= 1 && input <= 2) {
-                    switch (input) {
-                        case 1:
-                            menuSub2Cases();
-                        case 2:
-                            menuSub2Cases();
-                        case 3:
-                            menuSub2Cases();
-                        case 4:
-                            sc.close();
-                            sharedData.afterDriver();
-                            break;
+            if (possibleWin == 0.0) {
+                System.out.println();
+                System.out.println(ANSI_RED_BACKGROUND + "Nu am putut selecta meciuri valide pentru gradul de risc selectat!" + ANSI_RESET);
+                System.out.println(ANSI_RED_BACKGROUND + "Intoarcete la meniul anterior si selecteaza o alta grupa/grad de risc!" + ANSI_RESET);
+                System.out.println();
+                while (true) {
+                    menuHome.menuSub6();
+                    try {
+                        input = sc.nextInt();
+                        if (input >= 1 && input <= 2) {
+                            switch (input) {
+                                case 1:
+                                    menuSub2Cases();
+                                case 2:
+                                    sc.close();
+                                    sharedData.afterDriver();
+                                    break;
+                            }
+                        } else {
+                            System.out.println(ANSI_RED_BACKGROUND + "Optiunea nu exista!" + ANSI_RESET);
+                            System.out.println("|--------------------------------------------------------------------------|");
+                            System.out.println("Te rog sa alegi o optiune: ");
+                        }
+                    } catch (InputMismatchException e) {
+                        System.out.println(ANSI_RED_BACKGROUND
+                                + "Valoarea introdusa trebuie sa fie numarul din dreptul optiunii din meniu!" + ANSI_RESET);
+                        System.out.println("|--------------------------------------------------------------------------|");
+                        System.out.println("Te rog sa alegi o optiune: ");
+                        sc.nextLine();
                     }
-                } else {
-                    System.out.println(ANSI_RED_BACKGROUND + "Optiunea nu exista!" + ANSI_RESET);
-                    System.out.println("|--------------------------------------------------------------------------|");
-                    System.out.println("Te rog sa alegi o optiune: ");
                 }
-            } catch (InputMismatchException e) {
-                System.out.println(ANSI_RED_BACKGROUND
-                        + "Valoarea introdusa trebuie sa fie numarul din dreptul optiunii din meniu!" + ANSI_RESET);
-                System.out.println("|--------------------------------------------------------------------------|");
-                System.out.println("Te rog sa alegi o optiune: ");
-                sc.nextLine();
+            } else {
+                System.out.println();
+                System.out.println(ANSI_GREEN_BACKGROUND + "Posibil castig - calcul standard: " + String.format( "%.2f", possibleWin) + " RON" + ANSI_RESET);
+                System.out.println();
+                while (true) {
+                    menuHome.menuSub7();
+                    try {
+                        input = sc.nextInt();
+                        if (input >= 1 && input <= 3) {
+                            switch (input) {
+                                case 1:
+                                    if (riskValue == 1) {
+                                        casaMethods.printValidationResult(validNumberMap, 1, 2, riskValue);
+                                        menuHome.menuSub8();
+                                        while (true) {
+                                            try {
+                                                input = sc.nextInt();
+                                                if (input >= 1 && input <= 3) {
+                                                    switch (input){
+                                                        case 1:
+                                                            LocalDateTime myObj = LocalDateTime.now();
+                                                            DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+                                                            String exactTime = myObj.format(myFormatObj);
+                                                            casaMethods.printFile("|--------------------------------------------------------------------------|");
+                                                            casaMethods.printFile("");
+                                                            casaMethods.printFile("Biletul cu grad de risc " + input + " a fost salvat la data si ora: " + exactTime);
+                                                            casaMethods.printFile("");
+                                                            int size = finalGamesList.size();
+                                                            for (int i = 0; i < size; i++){
+                                                                String fullGame = finalGamesList.get(i);
+                                                                casaMethods.printFile(fullGame);
+                                                            }
+                                                            casaMethods.printFile("");
+                                                            casaMethods.printFile("Suma pariata " + amount + " RON");
+                                                            casaMethods.printFile("Castig posibil calculat standard: " + String.format( "%.2f", possibleWin) + " RON" );
+                                                            casaMethods.printFile("");
+                                                            casaMethods.printFile("|--------------------------------------------------------------------------|");
+                                                            casaMethods.printFile("");
+                                                            System.out.println(ANSI_GREEN_BACKGROUND+" BILET SALVAT! "+ANSI_RESET);
+                                                            menuHome.menuSub6 ();
+                                                            while (true) {
+                                                                try {
+                                                                    input = sc.nextInt();
+                                                                    if (input >= 1 && input <= 2) {
+                                                                        switch (input) {
+                                                                            case 1:
+                                                                                menuSub2Cases();
+                                                                            case 2:
+                                                                                sc.close();
+                                                                                sharedData.afterDriver();
+                                                                                break;
+                                                                        }
+                                                                    } else {
+                                                                        System.out.println(ANSI_RED_BACKGROUND + "Optiunea nu exista!" + ANSI_RESET);
+                                                                        System.out.println("|--------------------------------------------------------------------------|");
+                                                                        System.out.println("Te rog sa alegi o optiune: ");
+                                                                    }
+                                                                } catch (InputMismatchException e) {
+                                                                    System.out.println(ANSI_RED_BACKGROUND
+                                                                            + "Valoarea introdusa trebuie sa fie numarul din dreptul optiunii din meniu!" + ANSI_RESET);
+                                                                    System.out.println("|--------------------------------------------------------------------------|");
+                                                                    System.out.println("Te rog sa alegi o optiune: ");
+                                                                    sc.nextLine();
+                                                                }
+                                                            }
+                                                        case 2:
+                                                            menuSub2Cases();
+                                                        case 3:
+                                                            sc.close();
+                                                            sharedData.afterDriver();
+                                                            break;
+                                                    }
+                                                }else {
+                                                        System.out.println(ANSI_RED_BACKGROUND + "Optiunea nu exista!" + ANSI_RESET);
+                                                        System.out.println("|--------------------------------------------------------------------------|");
+                                                        System.out.println("Te rog sa alegi o optiune: ");
+                                                    }
+                                            } catch (InputMismatchException e) {
+                                                System.out.println(ANSI_RED_BACKGROUND
+                                                        + "Valoarea introdusa trebuie sa fie numarul din dreptul optiunii din meniu!" + ANSI_RESET);
+                                                System.out.println("|--------------------------------------------------------------------------|");
+                                                System.out.println("Te rog sa alegi o optiune: ");
+                                                sc.nextLine();
+                                            }
+                                        }
+                                    } else if (riskValue == 2) {
+                                        casaMethods.printValidationResult(validNumberMap, 2, 4, riskValue);
+                                        menuHome.menuSub8();
+                                        while (true) {
+                                            try {
+                                                input = sc.nextInt();
+                                                if (input >= 1 && input <= 3) {
+                                                    switch (input){
+                                                        case 1:
+                                                            LocalDateTime myObj = LocalDateTime.now();
+                                                            DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+                                                            String exactTime = myObj.format(myFormatObj);
+                                                            casaMethods.printFile("|--------------------------------------------------------------------------|");
+                                                            casaMethods.printFile("");
+                                                            casaMethods.printFile("Biletul cu grad de risc " + input + " a fost salvat la data si ora: " + exactTime);
+                                                            casaMethods.printFile("");
+                                                            int size = finalGamesList.size();
+                                                            for (int i = 0; i < size; i++){
+                                                                String fullGame = finalGamesList.get(i);
+                                                                casaMethods.printFile(fullGame);
+                                                            }
+                                                            casaMethods.printFile("");
+                                                            casaMethods.printFile("Suma pariata " + amount + " RON");
+                                                            casaMethods.printFile("Castig posibil calculat standard: " + String.format( "%.2f", possibleWin) + " RON" );
+                                                            casaMethods.printFile("");
+                                                            casaMethods.printFile("|--------------------------------------------------------------------------|");
+                                                            casaMethods.printFile("");
+                                                            System.out.println(ANSI_GREEN_BACKGROUND+" BILET SALVAT! "+ANSI_RESET);
+                                                            menuHome.menuSub6 ();
+                                                            while (true) {
+                                                                try {
+                                                                    input = sc.nextInt();
+                                                                    if (input >= 1 && input <= 2) {
+                                                                        switch (input) {
+                                                                            case 1:
+                                                                                menuSub2Cases();
+                                                                            case 2:
+                                                                                sc.close();
+                                                                                sharedData.afterDriver();
+                                                                                break;
+                                                                        }
+                                                                    } else {
+                                                                        System.out.println(ANSI_RED_BACKGROUND + "Optiunea nu exista!" + ANSI_RESET);
+                                                                        System.out.println("|--------------------------------------------------------------------------|");
+                                                                        System.out.println("Te rog sa alegi o optiune: ");
+                                                                    }
+                                                                } catch (InputMismatchException e) {
+                                                                    System.out.println(ANSI_RED_BACKGROUND
+                                                                            + "Valoarea introdusa trebuie sa fie numarul din dreptul optiunii din meniu!" + ANSI_RESET);
+                                                                    System.out.println("|--------------------------------------------------------------------------|");
+                                                                    System.out.println("Te rog sa alegi o optiune: ");
+                                                                    sc.nextLine();
+                                                                }
+                                                            }
+                                                        case 2:
+                                                            menuSub2Cases();
+                                                        case 3:
+                                                            sc.close();
+                                                            sharedData.afterDriver();
+                                                            break;
+                                                    }
+                                                }else {
+                                                    System.out.println(ANSI_RED_BACKGROUND + "Optiunea nu exista!" + ANSI_RESET);
+                                                    System.out.println("|--------------------------------------------------------------------------|");
+                                                    System.out.println("Te rog sa alegi o optiune: ");
+                                                }
+                                            } catch (InputMismatchException e) {
+                                                System.out.println(ANSI_RED_BACKGROUND
+                                                        + "Valoarea introdusa trebuie sa fie numarul din dreptul optiunii din meniu!" + ANSI_RESET);
+                                                System.out.println("|--------------------------------------------------------------------------|");
+                                                System.out.println("Te rog sa alegi o optiune: ");
+                                                sc.nextLine();
+                                            }
+                                        }
+                                    } else if (riskValue == 3) {
+                                        casaMethods.printValidationResult(validNumberMap, 4, Integer.MAX_VALUE, riskValue);
+                                        menuHome.menuSub8();
+                                        while (true) {
+                                            try {
+                                                input = sc.nextInt();
+                                                if (input >= 1 && input <= 3) {
+                                                    switch (input) {
+                                                        case 1:
+                                                            LocalDateTime myObj = LocalDateTime.now();
+                                                            DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+                                                            String exactTime = myObj.format(myFormatObj);
+                                                            casaMethods.printFile("|--------------------------------------------------------------------------|");
+                                                            casaMethods.printFile("");
+                                                            casaMethods.printFile("Biletul cu grad de risc " + input + " a fost salvat la data si ora: " + exactTime);
+                                                            casaMethods.printFile("");
+                                                            int size = finalGamesList.size();
+                                                            for (int i = 0; i < size; i++) {
+                                                                String fullGame = finalGamesList.get(i);
+                                                                casaMethods.printFile(fullGame);
+                                                            }
+                                                            casaMethods.printFile("");
+                                                            casaMethods.printFile("Suma pariata " + amount + " RON");
+                                                            casaMethods.printFile("Castig posibil calculat standard: " + String.format("%.2f", possibleWin) + " RON");
+                                                            casaMethods.printFile("");
+                                                            casaMethods.printFile("|--------------------------------------------------------------------------|");
+                                                            casaMethods.printFile("");
+                                                            System.out.println(ANSI_GREEN_BACKGROUND + " BILET SALVAT! " + ANSI_RESET);
+                                                            menuHome.menuSub6();
+                                                            while (true) {
+                                                                try {
+                                                                    input = sc.nextInt();
+                                                                    if (input >= 1 && input <= 2) {
+                                                                        switch (input) {
+                                                                            case 1:
+                                                                                menuSub2Cases();
+                                                                            case 2:
+                                                                                sc.close();
+                                                                                sharedData.afterDriver();
+                                                                                break;
+                                                                        }
+                                                                    } else {
+                                                                        System.out.println(ANSI_RED_BACKGROUND + "Optiunea nu exista!" + ANSI_RESET);
+                                                                        System.out.println("|--------------------------------------------------------------------------|");
+                                                                        System.out.println("Te rog sa alegi o optiune: ");
+                                                                    }
+                                                                } catch (InputMismatchException e) {
+                                                                    System.out.println(ANSI_RED_BACKGROUND
+                                                                            + "Valoarea introdusa trebuie sa fie numarul din dreptul optiunii din meniu!" + ANSI_RESET);
+                                                                    System.out.println("|--------------------------------------------------------------------------|");
+                                                                    System.out.println("Te rog sa alegi o optiune: ");
+                                                                    sc.nextLine();
+                                                                }
+                                                            }
+                                                        case 2:
+                                                            menuSub2Cases();
+                                                        case 3:
+                                                            sc.close();
+                                                            sharedData.afterDriver();
+                                                            break;
+                                                    }
+                                                } else {
+                                                    System.out.println(ANSI_RED_BACKGROUND + "Optiunea nu exista!" + ANSI_RESET);
+                                                    System.out.println("|--------------------------------------------------------------------------|");
+                                                    System.out.println("Te rog sa alegi o optiune: ");
+                                                }
+                                            } catch (InputMismatchException e) {
+                                                System.out.println(ANSI_RED_BACKGROUND
+                                                        + "Valoarea introdusa trebuie sa fie numarul din dreptul optiunii din meniu!" + ANSI_RESET);
+                                                System.out.println("|--------------------------------------------------------------------------|");
+                                                System.out.println("Te rog sa alegi o optiune: ");
+                                                sc.nextLine();
+                                            }
+                                        }
+                                    }
+                                case 2:
+                                    menuSub2Cases();
+                                case 3:
+                                    sc.close();
+                                    sharedData.afterDriver();
+                                    break;
+                            }
+                        } else {
+                            System.out.println(ANSI_RED_BACKGROUND + "Optiunea nu exista!" + ANSI_RESET);
+                            System.out.println("|--------------------------------------------------------------------------|");
+                            System.out.println("Te rog sa alegi o optiune: ");
+                        }
+                    } catch (InputMismatchException e) {
+                        System.out.println(ANSI_RED_BACKGROUND
+                                + "Valoarea introdusa trebuie sa fie numarul din dreptul optiunii din meniu!" + ANSI_RESET);
+                        System.out.println("|--------------------------------------------------------------------------|");
+                        System.out.println("Te rog sa alegi o optiune: ");
+                        sc.nextLine();
+                    }
+                }
+
             }
-
-
         }
     }
-
-    public void menuSub7Cases() throws InterruptedException {
-
-        while (true) {
-            System.out.println("SALVARE BILET");
-            menuHome.menuSub7();
-            try {
-                input = sc.nextInt();
-                if (input >= 1 && input <= 2) {
-                    switch (input) {
-                        case 1:
-                            menuSub2Cases();
-                        case 2:
-                            sc.close();
-                            sharedData.afterDriver();
-                            break;
-
-                    }
-                } else {
-                    System.out.println(ANSI_RED_BACKGROUND + "Optiunea nu exista!" + ANSI_RESET);
-                    System.out.println("|--------------------------------------------------------------------------|");
-                    System.out.println("Te rog sa alegi o optiune: ");
-                }
-            } catch (InputMismatchException e) {
-                System.out.println(ANSI_RED_BACKGROUND
-                        + "Valoarea introdusa trebuie sa fie numarul din dreptul optiunii din meniu!" + ANSI_RESET);
-                System.out.println("|--------------------------------------------------------------------------|");
-                System.out.println("Te rog sa alegi o optiune: ");
-                sc.nextLine();
-            }
-        }
-    }
-
-    public void menuSub8Cases(int riskValue) throws InterruptedException {
-
-        while (true) {
-            System.out.println("VERIFICA COTELE/GRADUL DE RISC");
-            menuHome.menuSub8();
-            try {
-                input = sc.nextInt();
-                if (input >= 1 && input <= 2) {
-                    switch (input) {
-                        case 1:
-                            menuSub2Cases();
-                        case 2:
-                            sc.close();
-                            sharedData.afterDriver();
-                            break;
-                    }
-                } else {
-                    System.out.println(ANSI_RED_BACKGROUND + "Optiunea nu exista!" + ANSI_RESET);
-                    System.out.println("|--------------------------------------------------------------------------|");
-                    System.out.println("Te rog sa alegi o optiune: ");
-                }
-            } catch (InputMismatchException e) {
-                System.out.println(ANSI_RED_BACKGROUND
-                        + "Valoarea introdusa trebuie sa fie numarul din dreptul optiunii din meniu!" + ANSI_RESET);
-                System.out.println("|--------------------------------------------------------------------------|");
-                System.out.println("Te rog sa alegi o optiune: ");
-                sc.nextLine();
-            }
-        }
-    }
-
     public int menuSub9Cases(int riskValue) throws InterruptedException {
 
         while (true) {

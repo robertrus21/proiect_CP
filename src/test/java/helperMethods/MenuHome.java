@@ -11,7 +11,7 @@ public class MenuHome {
         Thread.sleep(1000);
         System.out.println("Vreau sa te ajut sa pui un bilet la Casa Pariurilor.");
         Thread.sleep(1000);
-        System.out.println("Tu trebuie sa alegi doar grupa si gradul de risc, iar de restul ma ocup eu.");
+        System.out.println("Tu trebuie sa alegi doar grupa, gradul de risc si suma pe care doresti sa o pariezi, iar de restul ma ocup eu.");
         Thread.sleep(1000);
         System.out.println();
 
@@ -76,9 +76,8 @@ public class MenuHome {
         System.out.println();
         System.out.println(ANSI_GREEN_BACKGROUND+"|---------------------------OPTIUNI DISPONIBILE----------------------------|"+ANSI_RESET);
         System.out.println("1. Previzualizare bilet.");
-        System.out.println("2. Verifica cotele.");
-        System.out.println("3. Meniul anterior.");
-        System.out.println("4. Inchide programul.");
+        System.out.println("2. Meniul anterior.");
+        System.out.println("3. Inchide programul.");
         System.out.println(ANSI_GREEN_BACKGROUND+"|--------------------------------------------------------------------------|"+ANSI_RESET);
         Thread.sleep(500);
         System.out.print("Te rog sa alegi o optiune: ");
@@ -98,8 +97,9 @@ public class MenuHome {
     public void menuSub7 () throws InterruptedException {
         System.out.println();
         System.out.println(ANSI_GREEN_BACKGROUND+"|---------------------------OPTIUNI DISPONIBILE----------------------------|"+ANSI_RESET);
-        System.out.println("1. Meniul anterior.");
-        System.out.println("2. Inchide programul.");
+        System.out.println("1. Verificare cote raportat la gradul de risc ales.");
+        System.out.println("2. Meniul anterior.");
+        System.out.println("3. Inchide programul.");
         System.out.println(ANSI_GREEN_BACKGROUND+"|--------------------------------------------------------------------------|"+ANSI_RESET);
         Thread.sleep(500);
         System.out.print("Te rog sa alegi o optiune: ");
@@ -109,8 +109,9 @@ public class MenuHome {
     public void menuSub8 () throws InterruptedException {
         System.out.println();
         System.out.println(ANSI_GREEN_BACKGROUND+"|---------------------------OPTIUNI DISPONIBILE----------------------------|"+ANSI_RESET);
-        System.out.println("1. Meniul anterior.");
-        System.out.println("2. Inchide programul.");
+        System.out.println("1. Salveaza biletul.");
+        System.out.println("2. Meniul anterior.");
+        System.out.println("3. Inchide programul.");
         System.out.println(ANSI_GREEN_BACKGROUND+"|--------------------------------------------------------------------------|"+ANSI_RESET);
         Thread.sleep(500);
         System.out.print("Te rog sa alegi o optiune: ");

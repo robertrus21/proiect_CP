@@ -14,11 +14,6 @@ import java.time.Duration;
 public class SharedData {
 
     private static WebDriver webDriver;
-
-//    public SharedData() {
-//        super();
-//    }
-
     @BeforeMethod
     public void prepDriver() {
         ChromeOptions options = new ChromeOptions();

@@ -5,7 +5,15 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import pages.BasePage;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
+
+import static helperMethods.MenuHome.*;
 
 public class CasaMethods extends BasePage {
 
@@ -114,5 +122,25 @@ public class CasaMethods extends BasePage {
                     .min(Comparator.comparing(cota -> cota)).ifPresent(min -> validNumberMap.put(gameName, min));
         }
         return validNumberMap;
+    }
+
+    public void printValidationResult(Map<String, Double> validNumberMap, int x, int x1, int riskValue) {
+        for (String gameName : validNumberMap.keySet()) {
+            Double validNumber = validNumberMap.get(gameName);
+            if (validNumber >= x && validNumber <= x1) {
+                System.out.println();
+                System.out.println("Cota " + ANSI_GREEN_BACKGROUND +validNumber + ANSI_RESET + " se incadreaza in gradul de risc " + riskValue);
+            } else {
+                System.out.println();
+                System.out.println("Cota " + ANSI_RED_BACKGROUND +validNumber + ANSI_RESET + " nu se incadreaza in gradul de risc " + riskValue);
+            }
+        }
+    }
+
+    public void printFile(String gameLine) throws IOException {
+        Path fileName = Path.of("src/main/resources/Bilete.txt");
+        String nextLine = System.lineSeparator() + gameLine;
+        Files.write(fileName,  nextLine.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+
     }
 }

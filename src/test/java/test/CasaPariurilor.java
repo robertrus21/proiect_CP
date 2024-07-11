@@ -8,6 +8,8 @@ import pages.GamesPage;
 import pages.HomePage;
 import share.SharedData;
 
+import java.awt.*;
+
 public class CasaPariurilor extends SharedData {
 
     @Test
@@ -16,13 +18,6 @@ public class CasaPariurilor extends SharedData {
         MenuHome menuHome = new MenuHome();
         Menu menu = new Menu();
         homePage.navigateToSportGroup();
-
-//        gamesPage.gameCategory("ROMÂNIA LIGA 1");
-//        List<String> test = casaMethods.gamesFullLine().get(casaMethods.gamesNamesList().get(0));
-//        System.out.println(test.get(0));
-//        System.out.println(casaMethods.gamesFullLine());
-//        System.out.println(casaMethods.gamesFullLine().get(casaMethods.gamesNamesList().get(0)));
-
         menuHome.menuHome();
         menu.menuSub1Cases();
 

@@ -25,17 +25,10 @@ public class HomePage extends BasePage {
     @FindBy(id = "cookie-consent-button-accept")
     private WebElement acceptCookies;
 
-//    @FindBy(className = "brand-logo homepage-link")
-//    private WebElement home;
-
     public void navigateToSportGroup() {
         elementMethods.clickElement(ticketPopup);
         elementMethods.clickElement(acceptCookies);
     }
-
-//    public void navigateHome() {
-//        elementMethods.clickElement(home);
-//    }
 
     public List<String> gamesGroups() {
         WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(5));
