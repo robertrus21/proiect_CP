@@ -9,3 +9,22 @@ Suma pariata 20 RON
 Castig posibil calculat standard: 47.80 RON
 
 |--------------------------------------------------------------------------|
+
+|--------------------------------------------------------------------------|
+
+Biletul cu grad de risc 1 a fost salvat la data si ora: 11-07-2024 06:50:54
+
+UTA Arad - Rapid Bucuresti || 3.20 - 3.35 - ( 2.33 )
+U.Slobozia - FCSB || 6.60 - ( 3.80 ) - 1.60
+Petrolul - Gloria Buzau || 1.93 - ( 3.50 ) - 4.20
+FC Hermannstadt - Univ.Craiova || 2.95 - 3.30 - ( 2.50 )
+Botosani - Otelul Galati || ( 2.60 ) - 3.25 - 2.90
+Farul Constanta - U.Slobozia || 1.58 - ( 3.90 ) - 6.80
+FCSB - U.Cluj || 1.73 - ( 3.70 ) - 5.20
+Poli Iasi - Botosani || ( 2.40 ) - 3.20 - 3.20
+Sepsi - Poli Iasi || 1.78 - ( 3.70 ) - 4.80
+
+Suma pariata 20 RON
+Castig posibil calculat standard: 568.60 RON
+
+|--------------------------------------------------------------------------|
